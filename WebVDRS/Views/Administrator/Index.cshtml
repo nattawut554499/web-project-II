@@ -1,0 +1,84 @@
+﻿@{  
+    // admin
+    if (Session["Role"] == null || (int)Session["Role"] != 0)
+    {
+        Response.Redirect("/Error/AccessDenied");
+    }
+    ViewBag.Title = "Administrator";
+
+}
+
+<style>
+    body {
+        background-color: #f8f9fa !important;
+    }
+
+    div.card {
+        width: auto;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        text-align: center;
+    }
+
+    .badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        padding: 10px 10px;
+        border-radius: 15%;
+        background: red;
+        color: white;
+    }
+</style>
+
+<div class="album bg-light mt-3">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-3 p-lg-5">
+                <div class="card mb-3 bg-dark">
+                    <span id="redNotify" class="badge"><strong id="numberNewReport"></strong></span>
+                    <a href="/Administrator/Reporting" class="stretched-link"></a>
+                    <img class="card-img-top" src="~/Content/Images/VDRS-Logo.png" alt="Card image">
+                    <h5 class="card-title bg-dark text-light">การรายงานการกระทำความผิด</h5>
+                </div>
+            </div>
+            <div class="col-md-3 p-lg-5">
+                <div class="card mb-3 bg-dark">
+                    <a href="/Administrator/AddSecurityGuard" class="stretched-link"></a>
+                    <img class="card-img-top" src="~/Content/Images/VDRS-Logo.png" alt="Card image">
+                    <h5 class="card-title bg-dark text-light">เพิ่มบัญชี รปภ.</h5>
+                </div>
+            </div>
+            @*<div class="col-md-3 p-lg-5">
+                <div class="card mb-3 bg-dark">
+                    <span class="badge"><strong>1</strong></span>
+                    <a href="#" class="stretched-link"></a>
+                    <img class="card-img-top" src="~/Content/Images/VDRS-Logo.png" alt="Card image">
+                    <h5 class="card-title bg-dark text-light">test</h5>
+                </div>
+            </div>*@
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#redNotify').hide();
+        $.ajax({
+            type: 'post',
+            url: '/Administrator/countNewReport',
+            success: function (data) {
+                //$('#redNotify').hide();
+                if (data > 0) {
+                    $('#numberNewReport').text(data);
+                    $('#redNotify').show();
+                } else {
+                    $('#redNotify').hide();
+                }
+                console.log(data);
+            },
+            error: function (a, b, error) {
+                console.log(error);
+            }
+        });
+    });
+</script>

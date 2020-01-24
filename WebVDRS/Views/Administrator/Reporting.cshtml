@@ -1,0 +1,330 @@
+﻿@{
+    // admin
+    if (Session["Role"] == null || (int)Session["Role"] != 0)
+    {
+        Response.Redirect("/Error/AccessDenied");
+    }
+    ViewBag.Title = "Reporting";
+}
+<style>
+    body {
+        background-color: #dedfe8 !important;
+    }
+    .list-report {
+        cursor: pointer;
+    }
+    .newReport {
+        background-color: #c7ffdc !important;
+    }
+    .orangeBord {
+        border-left: solid;
+        border-left-width: 4px;
+        border-color: #ffc058;
+    }
+    .violetBord {
+        border-left: solid;
+        border-left-width: 4px;
+        border-color: #9d7c97;
+    }
+    .blueBord {
+        border: solid;
+        border-width: 4px;
+        border-color: #1199ff;
+    }
+    .svg_image {
+        max-width: 500px;
+        max-height: unset;
+    }
+
+    .evidence_image {
+        max-width: 50%;
+        max-height: unset;
+    }
+
+    .evidence_video {
+        max-width: 80%;
+        max-height: unset;
+    }
+    /* Next & previous buttons */
+    .prev, .next {
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        width: auto;
+        margin-top: -22px;
+        padding: 16px;
+        color: white !important;
+        font-weight: bold;
+        font-size: 18px;
+        transition: 0.6s ease;
+        border-radius: 0 3px 3px 0;
+        user-select: none;
+    }
+
+    /* Position the "next button" to the right */
+    .next {
+        right: 0;
+        border-radius: 3px 0 0 3px;
+    }
+    /* Position the "next button" to the right */
+    .prev {
+        left: 0;
+        border-radius: 3px 0 0 3px;
+    }
+
+        /* On hover, add a black background color with a little bit see-through */
+        .prev:hover, .next:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+</style>
+<div id="showReport" class="container mt-3">
+    <div class="my-3 p-2 rounded shadow-sm" style="background-color:#663e5e;">
+        <h5 class="pb-1 mb-0" style="color:aliceblue">การรายงานความผิดจากนักศึกษาและ รปภ.</h5>
+    </div>
+    <div id="noReport" class="rounded shadow-sm" style="background-color:#fcfcfc"></div>
+
+    <div id="modalShowEvidence" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                @*<div class="modal-header">
+                        <button type="button" data-dismiss="modalShowEvidence">close</button>
+                    </div>*@
+                <div id="modalSlideEvidencd" class="modal-body text-center" style="background-color:#212121">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#noReport').empty();
+    });
+    var slideIndex = 1;
+    var initialPlace = null;
+    var initialCharge = null;
+    var initialProvince = null;
+
+    a_getInitialData();
+    function a_getInitialData() {
+        $.ajax({
+            type: 'post',
+            url: '/Administrator/GetInitialData',
+            success: function (data) {
+                initialPlace = data[0];
+                initialCharge = data[1];
+                initialProvince = data[2];
+                //console.log(initialPlace);
+                //console.log(initialCharge);
+                //console.log(initialProvince);
+                //console.log(initialPlace.length);
+                a_getReport();
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+    function a_getReport() {
+        $.ajax({
+            type: 'post',
+            url: '/Administrator/getAllReport',
+            success: function (data) {
+                console.log(data);
+                //console.log(data.length);
+                if (data.length > 0) {
+                    $('#noReport').empty();
+                    a_showReport(data);
+                } else {
+                    $('#noReport').append(`<h6  class="p-2 text-secondary">ยังไม่มีการรายงาน</h6>`);
+                }
+            },
+            error: function (jqXHR, textStatus, error) {
+                console.log(error);
+            }
+        });
+    }
+    function a_showReport(rList) {
+        if (initialPlace == null || initialCharge == null || initialProvince == null) {
+            a_getInitialData();
+        }
+        for (var i = 0; i < rList.length; i++) {
+            if (rList[i].Place == "99") {
+                rList[i].Place = rList[i].AnotherPlace;
+            } else {
+                for (var j = 0; j < initialPlace.length; j++) {
+                    if (rList[i].Place == initialPlace[j].Value) {
+                        rList[i].Place = initialPlace[j].Name;
+                    }
+                }
+            }
+            var count = 1;
+            if (rList[i].ChargeType != null) {
+                var str = rList[i].ChargeType.split("][");
+
+                var Charge = "";
+                for (var k = 0; k < str.length; k++) {
+                    for (var l = 0; l < initialCharge.length; l++) {
+                        if (str[k] == initialCharge[l].Value) {
+                            Charge = Charge + count + ". " + initialCharge[l].Name + " ";
+                            count++;
+                        }
+                    }
+                }
+                rList[i].ChargeType = Charge;
+            } else {
+                rList[i].ChargeType = "";
+            }
+            if (rList[i].AnotherCharge != null) {
+                rList[i].ChargeType += count + ". " + rList[i].AnotherCharge;
+            }
+            for (var m = 0; m < initialProvince.length; m++) {
+                if (rList[i].Province == initialProvince[m].Value) {
+                    rList[i].Province = initialProvince[m].Name;
+                }
+            }
+            if (!(rList[i].SuspectInfo)) {
+                rList[i].SuspectInfo = "-";
+            }
+
+        }
+        for (var z = 0; z < rList.length; z++) {
+            $('#showReport').append(`<div id="contain` + rList[z].ReportingId + `" class="media my-3 p-3 bg-white rounded shadow-sm text-muted list-report ` + (rList[z].IsRecent ? ' newReport ' : '') + (rList[z].Role == 1? 'orangeBord ':'violetBord ') + `" onclick="a_ViewEvidence('` + rList[z].ReportingId + `')">
+        <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+            <strong class="d-block text-dark">`+ rList[z].Reporter + `</strong>
+            <span class="border-bottom">`+ a_formatTime(rList[z].SubmitTime) + `</span><br />
+            <span><strong class="text-dark">วันที่กระทำความผิด : </strong>`+ rList[z].Date + `</span><br />
+            <span><strong class="text-dark">เวลา : </strong> `+ rList[z].Time + ` น.</span><br />
+            <span><strong class="text-dark">สถานที่ : </strong>`+ rList[z].Place + `</span><br />
+            <span><strong class="text-dark">ฐานความผิด : </strong>`+ rList[z].ChargeType + `</span><br />
+            <span><strong class="text-dark">ช้อมูลส่วนตัวผู้กระทำความผิด : </strong>`+ rList[z].SuspectInfo + `</span><br />
+            <span><strong class="text-dark">หมายเลขทะเบียนยานพาหนะ : </strong>`+ rList[z].RegistrationNumber + ` ` + rList[z].Province + `</span><br />
+        </p>
+        <div id="`+ rList[z].ReportingId + `">
+            
+        </div>
+         </div>`);
+        }
+        for (var i = 0; i < rList.length; i++) {
+            $('#' + rList[i].ReportingId).append(`<svg width="100px" height="100px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><rect x="-1.829" y="-1.688" width="130.251" height="131.601" style="fill:#4a4a4a;" /><text x="26.603px" y="36.853px" style="font-family:'Corbel-Bold', 'Corbel', sans-serif;font-weight:700;font-size:12px;fill:#fff;">NO EVIDENCE</text><g><rect x="19.833" y="68.642" width="26.725" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;" /><path d="M38.096,84.477c0,0 3.297,-2.819 4.726,-2.342c1.428,0.476 3.318,5.162 3.318,5.162l-6.589,-0.012" style="fill:#fff;" /><path d="M39.032,87.345l-19.896,0.157c0,0 4.9,-10.143 6.492,-10.794c1.592,-0.652 4.266,6.839 4.266,6.839c0,0 2.52,-2.866 3.71,-2.736c1.19,0.131 3.964,3.558 3.964,3.558" style="fill:#fff;" /><circle cx="41.199" cy="74.098" r="2.305" style="fill:#fff;" /><rect x="71.596" y="68.642" width="38.259" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;" /><path d="M90.976,75.393c4.192,0 7.595,2.963 7.595,6.611c0,3.649 -3.403,6.611 -7.595,6.611c-4.192,0 -7.596,-2.962 -7.596,-6.611c0,-3.648 3.404,-6.611 7.596,-6.611Zm3.476,6.449l-5.273,2.706l0.114,-5.623l5.159,2.917Z" style="fill:#fff;" /></g>No evidence</svg>`);
+            $.ajax({
+                type: 'post',
+                data: { 'ReportingId': rList[i].ReportingId },
+                url: '/Evidence/getPreviewEvidence',
+                success: function (data) {
+
+                    if (!data) {
+                        console.log('no evidence');
+                    } else {
+                        if (data.FileType == "video") {
+                            $('#' + data.ReportingId).empty();
+                            $('#' + data.ReportingId).append(`<video class="m-3" width="110" height="110" src="http://localhost:65108` + data.FullPath.trim() + `">
+        </video >`);
+
+                        } else {
+                            $('#' + data.ReportingId).empty();
+                            $('#' + data.ReportingId).append(`<img class="m-3" src="http://localhost:65108` + data.FullPath.trim() + `" width="70" alt="Generic placeholder image">`);
+                        }
+                    }
+
+                },
+                error: function (a, b, error) {
+                    console.log(error);
+                }
+            });
+        }
+    }
+    function a_formatTime(a) {
+        if (a != null) {
+            var b = moment(a).format('DD-MM-YYYY HH:mm');
+            return b;
+        } else {
+            return 'sumit date is null';
+        }
+    }
+    //===== modal show evidence
+    function a_ViewEvidence(Report) {
+        $('#modalSlideEvidencd').empty();
+        slideIndex = 1;
+        $.ajax({
+            type: 'post',
+            data: { 'ReportingId': Report },
+            url: '/Evidence/getViewEvidence',
+            success: function (data) {
+                console.log(data);
+                if (data.length < 1) {
+                    $('#modalSlideEvidencd').append(`<svg class="svg_image" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><rect x="-1.829" y="-1.688" width="130.251" height="131.601" style="fill:#4a4a4a;" /><text x="26.603px" y="36.853px" style="font-family:'Corbel-Bold', 'Corbel', sans-serif;font-weight:700;font-size:12px;fill:#fff;">NO EVIDENCE</text><g><rect x="19.833" y="68.642" width="26.725" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;" /><path d="M38.096,84.477c0,0 3.297,-2.819 4.726,-2.342c1.428,0.476 3.318,5.162 3.318,5.162l-6.589,-0.012" style="fill:#fff;" /><path d="M39.032,87.345l-19.896,0.157c0,0 4.9,-10.143 6.492,-10.794c1.592,-0.652 4.266,6.839 4.266,6.839c0,0 2.52,-2.866 3.71,-2.736c1.19,0.131 3.964,3.558 3.964,3.558" style="fill:#fff;" /><circle cx="41.199" cy="74.098" r="2.305" style="fill:#fff;" /><rect x="71.596" y="68.642" width="38.259" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;" /><path d="M90.976,75.393c4.192,0 7.595,2.963 7.595,6.611c0,3.649 -3.403,6.611 -7.595,6.611c-4.192,0 -7.596,-2.962 -7.596,-6.611c0,-3.648 3.404,-6.611 7.596,-6.611Zm3.476,6.449l-5.273,2.706l0.114,-5.623l5.159,2.917Z" style="fill:#fff;" /></g>No evidence</svg>`);
+                } else if (data.length == 1) {
+                    if (data[0].FileType == "image") {
+                        $('#modalSlideEvidencd').append(`<img class="evidence_image" src="http://localhost:65108` + data[0].FullPath + `">`);
+                    } else {
+                        $('#modalSlideEvidencd').append(`<video controls class="evidence_video" src="http://localhost:65108` + data[0].FullPath + `"></video>`);
+                    }
+                } else if (data.length > 1) {
+                    $('#modalSlideEvidencd').append(`<a class="prev" onclick="a_plusSlides(-1)">&#10094;</a>
+                    <a class="next" onclick="a_plusSlides(1)">&#10095;</a>`);
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].FileType == "image") {
+                            $('#modalSlideEvidencd').append(`<div class="mySlides"><img class="evidence_image" src="http://localhost:65108` + data[i].FullPath + `"></div>`);
+                        } else {
+                            $('#modalSlideEvidencd').append(`<div class="mySlides"><video controls class="evidence_video" src="http://localhost:65108` + data[i].FullPath + `"></video></div>`);
+                        }
+                    }
+                    a_showSlides(1);
+                }
+                $('#modalShowEvidence').modal();
+                a_seenNewReport(Report);
+            },
+            error: function (a, b, error) {
+                console.log(error);
+            }
+        });
+        //console.log(Report);
+    }
+    //===== modal show evidence
+    function a_plusSlides(n) {
+        a_showSlides(slideIndex += n);
+    }
+    function a_showSlides(n) {
+        var i;
+        var slides = document.getElementsByClassName("mySlides");
+
+        if (n > slides.length) { slideIndex = 1 }
+        if (n < 1) { slideIndex = slides.length }
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+        }
+        slides[slideIndex - 1].style.display = "block";
+    }
+    function a_seenNewReport(id) {
+        $.ajax({
+            type: 'post',
+            data: { 'ReportingId': id },
+            url: '/Administrator/seenNewReport',
+            success: function (data) {
+                if (data) {
+                    $('#contain' + id).removeClass('newReport');
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+</script>
+@*<div id="containc9dd9ffd-adda-4d7e-b28b-41b7e0769e5b" class="media my-3 p-3 bg-white rounded shadow-sm text-muted list-report redBord mmm" onclick="ViewEvidence('c9dd9ffd-adda-4d7e-b28b-41b7e0769e5b')">
+        <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
+            <strong class="d-block text-dark">58114232</strong>
+            <span class="border-bottom">sumit date is null</span><br>
+            <span><strong class="text-dark">วันที่กระทำความผิด : </strong>11-12-2019</span><br>
+            <span><strong class="text-dark">เวลา : </strong> 17:17 น.</span><br>
+            <span><strong class="text-dark">สถานที่ : </strong>จุดตรวจประดู่(ป้อมวลัยคม)</span><br>
+            <span><strong class="text-dark">ฐานความผิด : </strong>1. จอดรถในพื้นที่ห้ามจอด </span><br>
+            <span><strong class="text-dark">ช้อมูลส่วนตัวผู้กระทำความผิด : </strong>ไม่ทราบ</span><br>
+            <span><strong class="text-dark">หมายเลขทะเบียนยานพาหนะ : </strong>1กก-7142 กรุงเทพมหานคร</span><br>
+        </p>
+        <div id="c9dd9ffd-adda-4d7e-b28b-41b7e0769e5b">
+
+            <svg width="100px" height="100px" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><rect x="-1.829" y="-1.688" width="130.251" height="131.601" style="fill:#4a4a4a;"></rect><text x="26.603px" y="36.853px" style="font-family:'Corbel-Bold', 'Corbel', sans-serif;font-weight:700;font-size:12px;fill:#fff;">NO EVIDENCE</text><g><rect x="19.833" y="68.642" width="26.725" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;"></rect><path d="M38.096,84.477c0,0 3.297,-2.819 4.726,-2.342c1.428,0.476 3.318,5.162 3.318,5.162l-6.589,-0.012" style="fill:#fff;"></path><path d="M39.032,87.345l-19.896,0.157c0,0 4.9,-10.143 6.492,-10.794c1.592,-0.652 4.266,6.839 4.266,6.839c0,0 2.52,-2.866 3.71,-2.736c1.19,0.131 3.964,3.558 3.964,3.558" style="fill:#fff;"></path><circle cx="41.199" cy="74.098" r="2.305" style="fill:#fff;"></circle><rect x="71.596" y="68.642" width="38.259" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;"></rect><path d="M90.976,75.393c4.192,0 7.595,2.963 7.595,6.611c0,3.649 -3.403,6.611 -7.595,6.611c-4.192,0 -7.596,-2.962 -7.596,-6.611c0,-3.648 3.404,-6.611 7.596,-6.611Zm3.476,6.449l-5.273,2.706l0.114,-5.623l5.159,2.917Z" style="fill:#fff;"></path></g>No evidence</svg>
+        </div>
+    </div>*@

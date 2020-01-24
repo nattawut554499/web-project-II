@@ -1,0 +1,190 @@
+﻿@{
+    // admin
+    if (Session["Role"] == null || (int)Session["Role"] != 0)
+    {
+        Response.Redirect("/Error/AccessDenied");
+    }
+    ViewBag.Title = "Add Security Guard";
+}
+<style>
+    body {
+        background-color: #f5f5f5;
+        /*background-color: #000000;*/
+    }
+    .purpleHeader {
+        background-color: #663e5e;
+    }
+    .my-form{
+        background-color:white;
+    }
+    .redFg{
+        color:red;
+    }
+</style>
+<div class="container mt-3 ">
+    <div class="my-3 p-2 rounded shadow purpleHeader">
+        <h5 class="pb-1 mb-0" style="color:aliceblue">เพิ่มบัญชี รปภ.</h5>
+    </div>
+</div>
+<div class="container mt-2">
+    <div class="p-4 rounded shadow my-form">
+        <div class="form-row" id="formAddSecurityGuard">
+            <div  class="form-group col-md-12 text-right"><small class="redFg"> * จำเป็นต้องกรอก</small></div>
+            <div class="form-group col-md-6">
+                <label><b>ชื่อ</b></label><sup class="redFg">*</sup>
+                <div class="input-group">
+                    <input id="gName" type="text" class="form-control" placeholder="First name" maxlength="35" onkeyup="checkFormNotNull(this)"/>
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label><b>นามสกุล</b></label><sup class="redFg">*</sup>
+                <div class="input-group">
+                    <input id="gLastName" type="text" class="form-control" placeholder="Last name" maxlength="35" onkeyup="checkFormNotNull(this)"/>
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label><b>Username</b></label><sup class="redFg"> *</sup>
+                <div class="input-group">
+                    <input id="gUsername" type="text" class="form-control" placeholder="Username" maxlength="35" onkeyup="checkFormNotNull(this)"/>
+                </div>
+                <p id="txtSameUsername" class="redFg">username ที่ท่านกรอกซ้ำกับชองผู้อื่น</p>
+            </div>
+            <div class="form-group col-md-6">
+                <label><b>Password</b></label><sup class="redFg"> *</sup>
+                <div class="input-group">
+                    <input id="gPassword" type="password" class="form-control mb-2" placeholder="Password" maxlength="35" onkeyup="checkFormNotNull(this)"/>
+                </div>
+                <div class="input-group date">
+                    <input id="gConfirmPassword" type="password" class="form-control" placeholder="Confirm password" maxlength="35" onkeyup="checkFormNotNull(this)"/>
+                </div>
+                <p id="txtPasswordNotMatch" class="redFg">รหัสผ่านไม่ตรงกัน</p><p id="txtPasswordMustMoreThanThree" class="redFg">รหัสผ่านต้องมี 4 ตัวอักษรขึ้นไป</p>
+            </div>
+        </div>
+        <div class="text-center">
+            <button class="btn btn-success btn-block" onclick="btnCheckGuardInfo()">เพิ่ม</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successSignUpModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header purpleHeader text-white" >
+                <h6 class="modal-title">การลงทะเบียน รปภ.</h6>
+                <button type="button" class="close" onclick="a_clearForm()">
+                    <span class="text-white">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>เพิ่ม <strong id="guardAddedName"></strong>&nbsp;<strong id="guardAddedLastName"></strong> เรียบร้อยแล้ว</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="a_clearForm()">ตกลง</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#txtPasswordNotMatch').hide();
+        $('#txtPasswordMustMoreThanThree').hide();
+        $('#txtSameUsername').hide();
+    });
+    var isPassMatch = false;
+    var isPassMore4 = false;
+    function btnCheckGuardInfo() {
+        isPassMatch = checkPasswordMatch(); // bool
+        isPassMore4 = checkPasswordLength();
+        var inputEl = null;
+        $('#formAddSecurityGuard').each(function () {
+            inputEl = $(this).find(':input');
+        });
+        var inputNotNull = true;
+        
+        inputEl.each(function () {
+            var bool = checkFormNotNull(this);
+            inputNotNull = inputNotNull && bool;
+        });
+
+        if (inputNotNull && isPassMatch && isPassMore4) {
+            addAccountGuard();
+        }
+    }
+    function checkFormNotNull(id) {
+        if (!$('#' + id.id).val().trim()) {
+            $(id).css("background-color", "#ff7a85");
+            return false;
+        } else {
+            $(id).css("background-color", "#ffffff");
+            return true;
+        }
+    }
+    function checkPasswordMatch() {
+        if ($('#gPassword').val().trim() == $('#gConfirmPassword').val().trim()) {
+            $('#txtPasswordNotMatch').hide();
+            return true;
+        } else {
+            $('#txtPasswordNotMatch').show();
+            return false;
+        }
+    }
+    function checkPasswordLength() {
+        var password1 = $('#gPassword').val().trim();
+        var password2 = $('#gConfirmPassword').val().trim();
+        if (password1.length < 4 || password2.length < 4) {
+            $('#gPassword').css("background-color", "#ff7a85");
+            $('#gConfirmPassword').css("background-color", "#ff7a85");
+            $('#txtPasswordMustMoreThanThree').show();
+            return false
+        } else {
+            $('#gPassword').css("background-color", "#ffffff");
+            $('#gConfirmPassword').css("background-color", "#ffffff");
+            $('#txtPasswordMustMoreThanThree').hide();
+            return true;
+        }
+    }
+    function addAccountGuard() {
+        var objNewGuard = {
+            Id: '',
+            GuardId: '',
+            GuardUsername: $('#gUsername').val().trim(),
+            GuardPassword: $('#gPassword').val().trim(),
+            GuardName: $('#gName').val().trim(),
+            GuardLastname: $('#gLastName').val().trim()
+        }
+        
+        $.ajax({
+            type: 'post',
+            url: '/Administrator/addSecurityGuard',
+            data: objNewGuard,
+            success: function (data) {
+                if (data.status) {
+                    $('#txtSameUsername').hide();
+                    $('#guardAddedName').text(data.name);
+                    $('#guardAddedLastName').text(data.lastname);
+                    $('#successSignUpModal').modal({ backdrop: 'static', keyboard: false });
+                } else {
+                    if (data.statusCode == 1) {
+                        $('#txtSameUsername').show();
+                    }
+                }
+                console.log(data);
+                
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+    function a_clearForm() {
+        $('#gName').val('');
+        $('#gLastName').val('');
+        $('#gUsername').val('');
+        $('#gPassword').val('');
+        $('#gConfirmPassword').val('');
+        $('#successSignUpModal').modal('hide');
+        $('#guardAddedName').text('');
+        $('#guardAddedLastName').text('');
+    }
+</script>
+

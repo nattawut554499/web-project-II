@@ -1,0 +1,58 @@
+﻿
+@{  // student
+    ViewBag.Title = "Home";
+    if (Session["Role"] == null || (int)Session["Role"] != 1)
+    {
+        Response.Redirect("/Error/AccessDenied");
+    }
+}
+<style>
+    div.card {
+        width: auto;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        text-align: center;
+    }
+
+    .badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        padding: 10px 10px;
+        border-radius: 15%;
+        background: red;
+        color: white;
+    }
+</style>
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-3 p-lg-5">
+            <div class="card mb-3 bg-dark">
+                <a href="/Student/Reporting" class="stretched-link"></a>
+                <img class="card-img-top" src="~/Content/Images/VDRS-Logo.png" alt="Card image">
+                <h5 class="card-title bg-dark text-light">การรายงานการกระทำความผิด</h5>
+            </div>
+        </div>
+        <div class="col-md-3 p-lg-5">
+            <div class="card mb-3 bg-dark">
+                <a href="/Student/Information" class="stretched-link"></a>
+                <img class="card-img-top" src="~/Content/Images/VDRS-Logo.png" alt="Card image">
+                <h5 class="card-title bg-dark text-light">ข้อมูลส่วนตัว</h5>
+            </div>
+        </div>
+        <div class="col-md-3 p-lg-5">
+            <div class="card mb-3 bg-dark">
+                <span class="badge"><strong>1</strong></span>
+                <a href="#" class="stretched-link"></a>
+                <img class="card-img-top" src="~/Content/Images/VDRS-Logo.png" alt="Card image">
+                <h5 class="card-title bg-dark text-light">การแจ้งเตือน</h5>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+       // $('#login_as').text('58114232');
+    });
+</script>
+
+

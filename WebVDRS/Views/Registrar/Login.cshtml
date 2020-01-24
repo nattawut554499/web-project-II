@@ -1,0 +1,145 @@
+﻿
+@{
+    Layout = null;
+    if(Session["Role"] != null)
+    {
+        if((int)Session["Role"] == 0)
+        {
+            Response.Redirect("/Administrator/Index");
+
+        }else if((int)Session["Role"] == 1)
+        {
+            Response.Redirect("/Student/Home");
+
+        }else if ((int)Session["Role"] == 2)
+        {
+            Response.Redirect("/SecurityGuard/Home");
+        }
+    }
+}
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Log in</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/jquery-3.0.0.min.js"></script>
+    <script type="module" src="~/Scripts/popper.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            background-color: #f5f5f5;
+            /*padding-top: 40px;*/
+            padding-bottom: 40px;
+            font-family: KwamSookRegularVX;
+            /*font-family:'Cordia New';
+            font-weight:900;*/
+        }
+
+        #form-login {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius:2%;
+        }
+        @@font-face {
+            font-family: 'KwamSookRegularVX';
+            src: url('../../fonts/KwamSookRegularVX.ttf') format('truetype');
+        }
+    </style>
+</head>
+<body>
+    <div class="text-center" id="form-login">
+        <img class="mb-4" src="~/Content/Images/VDRS-Logo.png" alt="" width="72" height="72">
+        <h2 class="mb-3 " style="color:#707070">ระบบรายงานพฤติกรรมการใช้ยานพาหนะ</h2>
+
+        <label for="inputUsername" class="sr-only">Username</label>
+        <input name="username" type="text" id="inputUsername" class="form-control" placeholder="Username" required="" autofocus="">
+        <p id="reqUsername" style="color:red"></p>
+
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input name="password" type="password" id="inputPassword" class="form-control mb-3 mt-2" placeholder="Password" required="">
+        <p id="reqPassword" style="color:red"></p>
+
+        <button style="background-color:#9c53a1;color:#e1e1e1" class="btn btn-lg btn-block" onclick="loginSubmit()">Sign in</button>
+    </div>
+</body>
+
+
+<script>
+    $(function () { });
+
+    function loginSubmit() {
+        $('#reqUsername').empty();
+        $('#reqPassword').empty();
+        var username = "";
+        var password = "";
+        
+        username = $('#inputUsername').val().trim();
+        password = $('#inputPassword').val().trim();
+        if ((username === null || username == "") && ( password === null || password == "")) {
+            reqAlert('#inputUsername');
+            reqAlert('#inputPassword');
+            $('#reqPassword').text('These field are required.');
+
+        } else if (username === null || username == "") {
+            $('#reqUsername').text('This field is required.');
+            reqAlert('#inputUsername');
+
+        } else if (password === null || password == "") {
+            $('#reqPassword').text('This field is required.');
+            reqAlert('#inputPassword');
+        } else {
+                    $.ajax({
+                        type: 'post',
+                        url: '/Registrar/UserLogin',
+                        data: { 'username': username, 'password': password },
+                        success: function (data) {
+                            if (data == "notMatch") {
+                                $('#reqPassword').text('The username and password you entered did not match our records.');
+                            } else {
+                                openMainPage(data);
+                            }
+                        },
+                        error: function (data) {
+                            console.log(data);
+                        }
+                    });
+                }
+
+    }
+
+    function reqAlert(id) {
+        $(id).css("background-color", "#ffcccc");
+    }
+    $('#inputUsername').keypress(function (e) {
+        $('#inputUsername').css("background-color", "#ffffff");
+    });
+    $('#inputPassword').keypress(function (e) {
+        $('#inputPassword').css("background-color", "#ffffff");
+        var key = e.which;
+        if (key == 13) {
+            loginSubmit();
+        }
+    });
+
+    function openMainPage(data) {
+        if (data.AccountRole == 0) {
+            window.location.replace("http://localhost:65108/Administrator/Index");
+        } else if (data.AccountRole == 1) {
+            window.location.replace("http://localhost:65108/Student/Home");
+        } else if (data.AccountRole == 2) {
+            window.location.replace("http://localhost:65108/SecurityGuard/Home");
+        } else {
+            window.location.replace("http://localhost:65108/Error/AccessDenied");
+        }
+    }
+
+</script>
+
+

@@ -1,0 +1,59 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Page Not Found</title>
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.datetimepicker.min.css" rel="stylesheet" />
+
+    <script src="~/Scripts/jquery-3.0.0.min.js"></script>
+    <script type="module" src="~/Scripts/popper.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <style>
+        body {
+            background-color: #f1f1f1;
+        }
+
+        @@font-face {
+            font-family: 'KwamSookRegularVX';
+            src: url('../../Fonts/KwamSookRegularVX.ttf') format('truetype');
+        }
+
+        .myBg {
+            height: 80vh;
+        }
+
+        #PnF {
+            margin-top: 20px;
+            color: #ff6a00;
+        }
+
+        p {
+            font-family: KwamSookRegularVX;
+            font-size: large;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container text-center myBg">
+        <h1 id="PnF" class="display-3">Page not Found!</h1>
+        <p>ขออภัยเราไม่พบที่อยู่ของเว็บตาม URL ที่ท่านร้องขอ (404)</p>
+    </div>
+    <div class="container text-center">
+        <div class="logoNtext">
+            <p translate="no"><img src="~/Content/Images/VDRS-Logo.png" width="30" height="30" alt="logo" class="m-2" />ระบบรายงานพฤติกรรมการใช้ยานพาหนะ</p>
+        </div>
+    </div>
+</body>
+</html>
