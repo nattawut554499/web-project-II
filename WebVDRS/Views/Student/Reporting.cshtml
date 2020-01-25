@@ -147,7 +147,7 @@
                             <div class="form-row">
                                 <div class="form-group col-6">
                                     <label for="suspectFaculty">สำนักวิชา</label>
-                                    <select id="suspectFaculty" class="form-control"></select>
+                                    <select id="suspectFaculty" class="form-control" onchange="setMajor()"></select>
                                 </div>
                                 <div class="form-group col">
                                     <label for="suspectMajor">สาขาวิชา</label>
@@ -340,6 +340,8 @@
 </div>
 
 <script>
+    var getInitFaculty = null;
+    var getInitMajor = null;
     $(document).ready(function () {
         if ($('#reportPlace').val() != "99") {
             $('#reportAnotherPlace').hide();
@@ -359,7 +361,8 @@
         
         //console.log(a);
         $("#radioMotorBike").prop("checked", true);
-        
+        getAllFaculty();
+        getAllMajor();
     });
     var slideIndex = 1;
     var initialPlace = null;
@@ -386,17 +389,57 @@
             }
         });
     }
+    function getAllFaculty() {
+        $.ajax({
+            type: 'post',
+            url: '/InitialWU/GetFaculty',
+            success: function (data) {
+                console.log(data);
+                getInitFaculty = data;
+                for (var i = 0; i < data.length; i++) {
+                    $('#suspectFaculty').append('<option value="' + data[i].Value + '">' + data[i].Name+'</option');
+                }
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    function getAllMajor() {
+        $.ajax({
+            type: 'post',
+            url: '/InitialWU/GetMajor',
+            success: function (data) {
+                console.log(data);
+                getInitMajor = data;
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        });
+    }
+    function setMajor() {
+        var selectedFaculty = $('#suspectFaculty').val();
+        $('#suspectMajor').empty();
+        $.each(getInitMajor, function (i, val) {
+            if (selectedFaculty == val.FacultyValue) {
+                $('#suspectMajor').append('<option value="' + val.Value + '">' + val.Name + '</option>');
+            }
+        });
+
+    }
     function checkSizeFileEvidence() {
         var fileUploadNotLarge = true;
         if ($('#FileEvidences').val() != null) {
             var numFiles = $('#FileEvidences')[0].files.length;
             for (var i = 0; i < numFiles; i++) {
-                if ($('#FileEvidences')[0].files[i].size > 1073741824) {
+                if ($('#FileEvidences')[0].files[i].size > 536870912) { // 512 MB
+                    //1073741824 = 1024 MB
                     fileUploadNotLarge = false;
                 }
             }
             if (!fileUploadNotLarge) {
-                $('#warningLargeFile').text('File should smaller than 1 Gigabyte.');
+                $('#warningLargeFile').text('File should smaller than 512 Megabytes.');
                 $('#warningLargeFile').show();
             } else {
                 $('#warningLargeFile').hide();
@@ -423,7 +466,7 @@
             step: 10,
             maxTime: Date.now()
         });
-
+        setMajor();
     }
     $.datetimepicker.setLocale('th');
     //$('#reportDate').datetimepicker({
@@ -581,7 +624,7 @@
             $('#suspectId').css("background-color", "#ff7a85");
         }
         if (placeNotNull && chargeNotNull && anotherchargeNotNull && registrationNotNull && fileUploadNotLarge && suspectIdNotNull) {
-            //submitReport();
+            submitReport();
             console.log('pass');
             // =============== var isTrue = moment(myTime.dateNow + " " + myTime.timeNow, "DD-MM-YYYY H:mm");
             
@@ -698,7 +741,11 @@
             url: '/Student/AddReport',
             data: objReport,
             success: function (data) {
-                UploadEvidence(data);
+                if (data.status) {
+                    UploadEvidence(data);
+                } else {
+                    alert("Session expired!");
+                }
             },
             error: function (jqXHR, textStatus, error) {
                 console.log(error);
@@ -723,14 +770,19 @@
             type: 'post',
             url: '/Student/GetAllReport',
             success: function (data) {
-                //console.log(data);
+                console.log(data);
                 //console.log(data.length);
-                if (data.length > 0) {
-                    $('#noReport').empty();
-                    showReport(data);
+                if (data.status) {
+                    if (data.fetchs.length > 0) {
+                        $('#noReport').empty();
+                        showReport(data.fetchs);
+                    } else {
+                        $('#noReport').append(`<h6  class="p-2 text-secondary">ยังไม่มีการรายงาน</h6>`);
+                    }
                 } else {
-                    $('#noReport').append(`<h6  class="p-2 text-secondary">ยังไม่มีการรายงาน</h6>`);
+                    $('#noReport').append(`<h6  class="p-2 text-secondary">ยังไม่มีการรายงาน *</h6>`);
                 }
+                
             },
             error: function (jqXHR, textStatus, error) {
                 console.log(error);
