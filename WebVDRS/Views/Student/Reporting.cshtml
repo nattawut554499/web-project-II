@@ -802,21 +802,21 @@
             IsTheSameCase: false
         }
         console.log(objReport);
-        //$.ajax({
-        //    type: 'post',
-        //    url: '/Student/AddReport',
-        //    data: objReport,
-        //    success: function (data) {
-        //        if (data.status) {
-        //            UploadEvidence(data);
-        //        } else {
-        //            alert("Session expired!");
-        //        }
-        //    },
-        //    error: function (jqXHR, textStatus, error) {
-        //        console.log(error);
-        //    }
-        //});
+        $.ajax({
+            type: 'post',
+            url: '/Student/AddReport',
+            data: objReport,
+            success: function (data) {
+                if (data.status) {
+                    UploadEvidence(data);
+                } else {
+                    alert("Session expired!");
+                }
+            },
+            error: function (jqXHR, textStatus, error) {
+                console.log(error);
+            }
+        });
     }
 
     function UploadEvidence(data) {

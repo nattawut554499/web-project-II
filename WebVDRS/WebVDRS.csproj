@@ -207,6 +207,10 @@
     <Compile Include="Migrations\202001240037529_faculty_major.Designer.cs">
       <DependentUpon>202001240037529_faculty_major.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202001261225508_englishName.cs" />
+    <Compile Include="Migrations\202001261225508_englishName.Designer.cs">
+      <DependentUpon>202001261225508_englishName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\BlogDbContext.cs" />
     <Compile Include="Models\Evidence.cs" />
@@ -242,6 +246,7 @@
     <Content Include="Views\Administrator\AddSecurityGuard.cshtml" />
     <Content Include="Views\Student\Information.cshtml" />
     <Content Include="Views\Error\PageNotFound.cshtml" />
+    <Content Include="Views\InitialWU\ForTestingSystem.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -251,7 +256,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\InitialWU\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\202001071438572_add-reporting-role.resx">
@@ -265,6 +269,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202001240037529_faculty_major.resx">
       <DependentUpon>202001240037529_faculty_major.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202001261225508_englishName.resx">
+      <DependentUpon>202001261225508_englishName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

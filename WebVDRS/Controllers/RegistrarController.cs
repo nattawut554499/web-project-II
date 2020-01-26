@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using WebVDRS.Models;
 
@@ -26,7 +27,7 @@ namespace WebVDRS.Controllers
                 var u = db.accounts.Where(a => a.AccountUsername == username).FirstOrDefault();
                 if (u != null)
                 {
-                    if (u.AccountPassword == password)
+                    if (string.Compare(Crypto.Hash(password), u.AccountPassword) == 0 )
                     {
                         Session["Role"] = u.AccountRole;
                         Session["userName"] = u.AccountUsername;

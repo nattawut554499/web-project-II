@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using WebVDRS.Models;
 
@@ -10,10 +11,11 @@ namespace WebVDRS.Controllers
     public class InitialWUController : Controller
     {
         // GET: InitialWU
-        public ActionResult Index()
+        public ActionResult ForTestingSystem()
         {
             return View();
         }
+
         [HttpPost]
         public ActionResult GetFaculty()
         {
@@ -45,6 +47,34 @@ namespace WebVDRS.Controllers
                 //db.SaveChanges();
                 return new JsonResult { Data = major, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
+        }
+        [HttpPost]
+        public ActionResult addStudent(Student student)
+        {
+            using (BlogDbContext db = new BlogDbContext())
+            {
+                string pass = student.StudentNameEng + student.StudentLastnameEng;
+                pass = pass.ToLower();
+                student.StudentPassword = Crypto.Hash(pass);
+                db.students.Add(student);
+                db.SaveChanges();
+                Account acc = new Account();
+                
+                acc.AccountUsername = student.StudentId;
+                acc.AccountPassword = student.StudentPassword;
+                acc.AccountRole = 1;
+                var mystatus = addStudentAccount(acc);
+                return new JsonResult { Data = new { status = mystatus}, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+            }
+        }
+        public bool addStudentAccount(Account account)
+        {
+            using (BlogDbContext db = new BlogDbContext())
+            {
+                db.accounts.Add(account);
+                db.SaveChanges();
+                return true;
+            }     
         }
     }
 }

@@ -1,0 +1,143 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/jquery-3.0.0.min.js"></script>
+    <script type="module" src="~/Scripts/popper.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/modernizr-2.6.2.js"></script>
+    <title>ForTestingSystem</title>
+    <style>
+        input {
+            border:1px solid;
+            border-color:#959595;
+            border-radius:3px;
+            padding-left:5px;
+        }
+    </style>
+</head>
+<body>
+    <br />
+    <div class="container">
+        <h6>Add student</h6>
+        <label>รหัส นศ.</label>
+        <input id="stdId" maxlength="8" />
+        <br />
+        <label>ชื่อ</label>
+        <input id="stdNameTha" maxlength="35" />
+        <label>นามสกุล</label>
+        <input id="stdLastNameTha" maxlength="35" />
+        <label>First name</label>
+        <input id="stdNameEng" maxlength="35" />
+        <label>Last name</label>
+        <input id="stdLastNameEng" maxlength="35" />
+        <br />
+        <label>เพศ</label>
+        <div class="form-check form-check-inline ml-2">
+            <input class="form-check-input" type="radio" name="gender" id="radioMale" value="M">
+            <label class="form-check-label" for="radioMale">ชาย</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="gender" id="radioFemale" value="F">
+            <label class="form-check-label" for="radioFemale">หญิง</label>
+        </div>
+        <br />
+        <label>สำนักวิชา</label>
+        <select id="selectFaculty" onchange="t_setMajor()"></select>
+        <label>สาขาวิชา</label>
+        <select id="selectMajor"></select>
+        <div class="text-center">
+            <button class="btn btn-sm btn-success" onclick="t_addStudent()">เพิ่ม</button>
+        </div>
+        
+        <hr />
+    </div>
+
+
+    <script>
+        var initFaculty = null;
+        var initMajor = null;
+
+        $(document).ready(function () {
+            t_getAllFaculty();
+            t_getAllMajor()
+            $("#radioMale").prop("checked", true);
+        });
+        function t_getAllFaculty() {
+            $.ajax({
+                type: 'post',
+                url: '/InitialWU/GetFaculty',
+                success: function (data) {
+                    initFaculty = data;
+                    $('#selectFaculty').empty();
+                    for (var i = 0; i < data.length; i++) {
+                        $('#selectFaculty').append('<option value="' + data[i].Value + '">' + data[i].Name + '</option>');
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+        function t_getAllMajor() {
+            $.ajax({
+                type: 'post',
+                url: '/InitialWU/GetMajor',
+                success: function (data) {
+                    initMajor = data;
+                    t_setMajor();
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
+        }
+        function t_setMajor() {
+            var selectedFaculty = $('#selectFaculty').val();
+            $('#selectMajor').empty();
+            $.each(initMajor, function (i, val) {
+                if (selectedFaculty == val.FacultyValue) {
+                    $('#selectMajor').append('<option value="' + val.Value + '">' + val.Name + '</option>');
+                }
+            });
+        }
+        function t_addStudent() {
+            var objStudent = {
+                Id: '',
+                StudentId: $('#stdId').val().trim(),
+                StudentPassword: '',
+                StudentName: $('#stdNameTha').val().trim(),
+                StudentLastname: $('#stdLastNameTha').val().trim(),
+                StudentNameEng: $('#stdNameEng').val().trim(),
+                StudentLastnameEng: $('#stdLastNameEng').val().trim(),
+                StudentStatus: 1,
+                StudentMajor: $('#selectMajor').val(),
+                StudentFaculty: $('#selectFaculty').val(),
+                StudyStatus: null,
+                StudyGender: $('input[name="gender"]:checked').val()
+            }
+            console.log(objStudent);
+            $.ajax({
+                type: 'post',
+                url: '/InitialWU/addStudent',
+                data: objStudent,
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

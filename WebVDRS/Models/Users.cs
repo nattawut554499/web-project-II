@@ -24,8 +24,9 @@ namespace WebVDRS.Models
         public string StudentPassword { get; set; }
         public string StudentName { get; set; }
         public string StudentLastname { get; set; }
+        public string StudentNameEng { get; set; }
+        public string StudentLastnameEng { get; set; }
         public int StudentStatus { set; get; }
-
         public string StudentMajor { get; set; }
         public string StudentFaculty { get; set; }
         public string StudyStatus { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using WebVDRS.Models;
 
@@ -92,7 +93,7 @@ namespace WebVDRS.Controllers
                     string id = strBuilder.ToString();
 
                     guard.GuardId = id;
-
+                    guard.GuardPassword = Crypto.Hash(guard.GuardPassword);
                     db.securityGuards.Add(guard);
                     db.SaveChanges();
 
