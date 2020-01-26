@@ -1,9 +1,9 @@
 ﻿
 @{          //student
-    //if (Session["Role"] == null || (int)Session["Role"] != 1)
-    //{
-    //    Response.Redirect("/Error/AccessDenied");
-    //}
+    if (Session["Role"] == null || (int)Session["Role"] != 1)
+    {
+        Response.Redirect("/Error/AccessDenied");
+    }
     ViewBag.Title = "Reporting";
 
 }
@@ -75,6 +75,9 @@
         border-width:4px;
         border-color:#1199ff;
     }
+    .redFg {
+        color: red;
+    }
 </style>
 
 <div id="showReport" class="container mt-3">
@@ -95,20 +98,21 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" id="ID" value="0" />
+                    <div class="col-md-12 text-right"><small class="redFg"> * จำเป็น</small></div>
                     <div class="row">
                         <div class="col-6">
                             <div class="form-group">
-                                <label><b>วันที่กระทำความผิด</b></label>
+                                <label><b>วันที่กระทำความผิด</b></label><sup class="redFg">*</sup>
                                 <div class="input-group">
                                     <input type="text" id="reportDate" class="form-control" readonly onchange="IsToday()" />
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label><b>สถานที่</b></label>
+                                <label><b>สถานที่</b></label><sup class="redFg"> *</sup>
                                 <select id="reportPlace" class="form-control" style="min-width:100%" onchange="onSelectPlaceReport()">
-                                    <option value="10">จุดตรวจประดู่(ป้อมวลัยคม)</option>
-                                    <option value="11">จุดตรวจวงเวียน</option>
-                                    <option value="12">จุดตรวจอาคารกิจกรรม(ทางเข้าเขตหอพัก)</option>
+                                    @*<option value="10">จุดตรวจประดู่(ป้อมวลัยคม)</option>
+                        <option value="11">จุดตรวจวงเวียน</option>
+                        <option value="12">จุดตรวจอาคารกิจกรรม(ทางเข้าเขตหอพัก)</option>*@
                                     <option value="13">พื้นที่เขตหอพัก</option>
                                     <option value="14">ศูนย์อาหารช่อประดู่</option>
                                     <option value="15">กลุ่มอาคารเรียนรวมและอาคารไทยบุรี</option>
@@ -131,7 +135,7 @@
                                     <label for="suspectId">รหัสนักศึกษา</label>
                                 </div>
                                 <div class="form-group col">
-                                    <input type="text" maxlength="8" placeholder="รหัสนักศึกษา" class="form-control" id="suspectId" onkeyup="onCheckSuspectId()">
+                                    <input type="text" maxlength="8" placeholder="รหัสนักศึกษา" class="form-control" id="suspectId" onkeypress="return checkSuspectId(event)">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -154,20 +158,20 @@
                                     <select id="suspectMajor" class="form-control"></select>
                                 </div>
                             </div>
-                            
+
 
                         </div>
                         @*================================================*@
                         <div class="col-6">
                             <div class="form-group">
-                                <label><b>เวลา</b></label>
+                                <label><b>เวลา</b></label><sup class="redFg">*</sup>
                                 <div class="input-group">
                                     <input type="text" id="reportTime" class="form-control" maxlength="5" readonly />
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label><b>ลักษณะการกระทำความผิด</b></label>
+                                <label><b>ลักษณะการกระทำความผิด</b></label><sup class="redFg">*</sup>
                                 <div class="custom-control custom-checkbox mr-sm-2">
                                     <input type="checkbox" class="custom-control-input checkbox-charge" id="checkParking" onchange="reqCharge()">
                                     <label class="custom-control-label" for="checkParking">จอดรถในพื้นที่ห้ามจอด</label>
@@ -181,9 +185,9 @@
                                     <label class="custom-control-label" for="checkSticker">ใช้รถที่ไม่มีบัตรผ่านเข้าออก(สติกเกอร์)</label>
                                 </div>
                                 @*<div class="custom-control custom-checkbox mr-sm-2">
-                <input type="checkbox" class="custom-control-input checkbox-charge" id="checkDriverLicense" onchange="reqCharge()">
-                <label class="custom-control-label" for="checkDriverLicense">ขับรถโดยไม่มีใบอนุญาตขับขี่</label>
-            </div>*@
+                        <input type="checkbox" class="custom-control-input checkbox-charge" id="checkDriverLicense" onchange="reqCharge()">
+                        <label class="custom-control-label" for="checkDriverLicense">ขับรถโดยไม่มีใบอนุญาตขับขี่</label>
+                    </div>*@
                                 <div class="custom-control custom-checkbox mr-sm-2">
                                     <input type="checkbox" class="custom-control-input checkbox-charge" id="checkModify" onchange="reqCharge()">
                                     <label class="custom-control-label" for="checkModify">ใช้รถดัดแปลงสภาพ เสียงดังผิดปกติ</label>
@@ -196,10 +200,10 @@
                                 <p id="reqCharge" style="color:red">(กรุณาเลือกฐานความผิด)</p>
                             </div>
                             <div class="form-inline">
-                                <label><b>ชนิดยานพาหนะ</b></label>
+                                <label><b>ชนิดยานพาหนะ</b></label><sup class="redFg"> *</sup>
                                 <div class="form-check form-check-inline ml-2">
                                     <input class="form-check-input" type="radio" name="vehicleRadioOptions" id="radioMotorBike" value="motorBike">
-                                    <label class="form-check-label" for="radioMotorBike">รถจักยานยนต์</label>
+                                    <label class="form-check-label" for="radioMotorBike">รถจักรยานยนต์</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="vehicleRadioOptions" id="radioCar" value="car">
@@ -207,15 +211,19 @@
                                 </div>
                             </div>
                             <div class="form-group" style="margin-bottom:0px !important">
-                                <label><b>หมายเลขทะเบียนยานพาหนะ</b></label>
+                                <label><b>หมายเลขทะเบียนยานพาหนะ</b></label><sup class="redFg"> *</sup>
                             </div>
                             <div class="row">
-                                <div class="col-5">
+                                <div class="col-2">
                                     <div class="form-group">
-                                        <input type="text" id="registrationNumber" class="form-control" maxlength="8" onkeyup="reqAlert('#registrationNumber')" />
+                                        <input type="text" id="registrationNumber1" maxlength="3" class="form-control" onkeypress="return checkRegistrationNumber1(event)" />
                                     </div>
                                 </div>
-                                <div class="col-7">
+                                <p>-</p>
+                                <div class="col-3">
+                                    <input type="text" id="registrationNumber2" class="form-control" maxlength="4" onkeypress="return checkRegistrationNumber2(event)" />
+                                </div>
+                                <div class="col-6">
                                     <select id="vehicleProvince" class="form-control">
                                         <option value="10">กรุงเทพมหานคร</option>
                                         <option value="81">กระบี่</option>
@@ -299,7 +307,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <small style="color:darkblue">( ตัวอย่าง 1กก-7142 )</small>
+                                <small style="color:darkblue">( ตัวอย่าง 1กก - 7142 )</small>
                             </div>
                             <div class="form-group">
                                 <label><b>หลักฐาน(ภาพถ่าย/วิดีโอ)</b></label>
@@ -394,10 +402,11 @@
             type: 'post',
             url: '/InitialWU/GetFaculty',
             success: function (data) {
-                console.log(data);
                 getInitFaculty = data;
+                $('#suspectFaculty').empty();
+                $('#suspectFaculty').append('<option value="' + 0 + '">ไม่ทราบ</option>');
                 for (var i = 0; i < data.length; i++) {
-                    $('#suspectFaculty').append('<option value="' + data[i].Value + '">' + data[i].Name+'</option');
+                    $('#suspectFaculty').append('<option value="' + data[i].Value + '">' + data[i].Name+'</option>');
                 }
             },
             error: function (data) {
@@ -410,7 +419,6 @@
             type: 'post',
             url: '/InitialWU/GetMajor',
             success: function (data) {
-                console.log(data);
                 getInitMajor = data;
             },
             error: function (data) {
@@ -426,7 +434,7 @@
                 $('#suspectMajor').append('<option value="' + val.Value + '">' + val.Name + '</option>');
             }
         });
-
+        $('#suspectMajor').append('<option value="' + 0 + '">ไม่ทราบ</option>');
     }
     function checkSizeFileEvidence() {
         var fileUploadNotLarge = true;
@@ -501,6 +509,14 @@
                 maxTime: Date.now()
             });
         }
+    }
+    function checkSuspectId(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        $('#suspectId').css("background-color", "#ffffff");
+        return true;
     }
     function onCheckSuspectId() {
         var susId = $('#suspectId').val().trim();
@@ -588,6 +604,38 @@
             $(id).css("background-color", "#ff7a85");
         }
     }
+    function checkRegistrationNumber1(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        
+        if (charCode > 31 && ((charCode < 48 || charCode > 57) && (charCode < 3585 || charCode > 3630))) {
+            return false;
+        }
+        $('#registrationNumber1').css("background-color", "#ffffff");
+        return true;
+    }
+    
+    function checkRegistrationNumber2(evt) {
+        var charCode = (evt.which) ? evt.which : evt.keyCode;
+        
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        $('#registrationNumber2').css("background-color", "#ffffff");
+        return true;
+    }
+    function checkRegistrationNumber() {
+        if ((!$('#registrationNumber1').val().trim()) || (!$('#registrationNumber2').val().trim())) {
+            if (!$('#registrationNumber1').val().trim()) {
+                $('#registrationNumber1').css("background-color", "#ff7a85");
+            }
+            if (!$('#registrationNumber2').val().trim()) {
+                $('#registrationNumber2').css("background-color", "#ff7a85");
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     function btnConfirm() {
         getAllSuspectInfo(); 
@@ -614,10 +662,8 @@
             $('#reportAnotherCharge').css("background-color", "#ff7a85");
             anotherchargeNotNull = false;
         }
-        if (!$('#registrationNumber').val().trim()) {
-            $('#registrationNumber').css("background-color", "#ff7a85");
-            registrationNotNull = false;
-        }
+        
+        registrationNotNull = checkRegistrationNumber();
         fileUploadNotLarge = checkSizeFileEvidence();
         suspectIdNotNull = onCheckSuspectId();
         if (!suspectIdNotNull) {
@@ -632,12 +678,10 @@
     }
 
     function clearForm() {
-        $('#reportPlace').val('10');
+        $('#reportPlace').val('13');
         onSelectPlaceReport();
         $('.checkbox-charge').prop('checked', false);
         onCheckAnotherCharge();
-        $('#registrationNumber').val('');
-        $('#registrationNumber').css("background-color", "#ffffff");
         
         $('#vehicleProvince').val('80');
         $('#FileEvidences').val(null);
@@ -647,6 +691,12 @@
         $('#suspectId').css("background-color","#ffffff");
         $('#suspectFirstName').val('');
         $('#suspectLastName').val('');
+        $('#suspectFaculty').val('0');
+        $('#suspectMajor').val('0');
+        $('#registrationNumber1').val('');
+        $('#registrationNumber2').val('');
+        $('#registrationNumber1').css("background-color", "#ffffff");
+        $('#registrationNumber2').css("background-color", "#ffffff");
     }
     function reqCharge() {
         if ($('#checkParking').prop('checked') ||
@@ -708,15 +758,31 @@
         var faculty = '';
         var major = '';
 
+        if (id !== '-' || name !== '-' || lname !== '-') {
+            $.each(getInitFaculty, function (i, val) {
+                if ($('#suspectFaculty').val() == val.Value) {
+                    faculty = val.Name;
+                }
+            });
+            $.each(getInitMajor, function (i, val) {
+                if ($('#suspectMajor').val() == val.Value) {
+                    major = val.Name;
+                }
+            });
+        } else {
+            faculty = '-';
+            major = '-';
+        }
+        return 'รหัสนักศึกษา: ' + id + ' ชื่อ: ' + name + ' นามสกุล: ' + lname + ' สำนักวิชา: ' + faculty + ' สาชาวิชา: ' + major;
     }
     function submitReport() {
         var allSuspectInfo = getAllSuspectInfo();
         var objReport = {
             Id: $('#ID').val(),
             ReportingId: "",
-            RegistrationNumber: $('#registrationNumber').val().trim(),
+            RegistrationNumber: $('#registrationNumber1').val().trim() + '-' + $('#registrationNumber2').val().trim(),
             Province: $('#vehicleProvince').val(),
-            SuspectInfo: $('#suspectInfo').val(),
+            SuspectInfo: allSuspectInfo,
             Place: $('#reportPlace').val(),
             AnotherPlace: $('#reportAnotherPlace').val().trim(),
             Date: $('#reportDate').val(),
@@ -735,22 +801,22 @@
             VehicleType: $('input[name="vehicleRadioOptions"]:checked').val(),
             IsTheSameCase: false
         }
-
-        $.ajax({
-            type: 'post',
-            url: '/Student/AddReport',
-            data: objReport,
-            success: function (data) {
-                if (data.status) {
-                    UploadEvidence(data);
-                } else {
-                    alert("Session expired!");
-                }
-            },
-            error: function (jqXHR, textStatus, error) {
-                console.log(error);
-            }
-        });
+        console.log(objReport);
+        //$.ajax({
+        //    type: 'post',
+        //    url: '/Student/AddReport',
+        //    data: objReport,
+        //    success: function (data) {
+        //        if (data.status) {
+        //            UploadEvidence(data);
+        //        } else {
+        //            alert("Session expired!");
+        //        }
+        //    },
+        //    error: function (jqXHR, textStatus, error) {
+        //        console.log(error);
+        //    }
+        //});
     }
 
     function UploadEvidence(data) {
@@ -759,7 +825,7 @@
         $('#RoleReporter').val('StudentsReport');
         if (!$('#FileEvidences').val()) {
             location.reload(true);
-            console.log('null'); // no file evidence
+            // no file evidence
         } else {
             $('#formUploadEvidence').submit();
         }
@@ -770,7 +836,7 @@
             type: 'post',
             url: '/Student/GetAllReport',
             success: function (data) {
-                console.log(data);
+                
                 //console.log(data.length);
                 if (data.status) {
                     if (data.fetchs.length > 0) {
@@ -834,6 +900,17 @@
 
         }
         for (var z = 0; z < rList.length; z++) {
+            var vehicT = rList[z].VehicleType;
+            if (vehicT == "motorBike") {
+                rList[z].VehicleType = "รถจักรยานยนต์";
+            } else {
+                if (vehicT == "car") {
+                    rList[z].VehicleType = "รถยนต์";
+                } else {
+                    rList[z].VehicleType = "-";
+                }
+            }
+            // =====================
             $('#showReport').append(`<div id="contain` + rList[z].ReportingId + `" class="media my-3 p-3 bg-white rounded shadow-sm text-muted list-report orangeBord" onclick="ViewEvidence('` + rList[z].ReportingId + `')">
         <p class="media-body pb-3 mb-0 small lh-125 border-bottom border-gray">
             <strong class="d-block text-dark">`+ rList[z].Reporter + `</strong>
@@ -844,6 +921,7 @@
             <span><strong class="text-dark">ฐานความผิด : </strong>`+ rList[z].ChargeType + `</span><br />
             <span><strong class="text-dark">ช้อมูลส่วนตัวผู้กระทำความผิด : </strong>`+ rList[z].SuspectInfo + `</span><br />
             <span><strong class="text-dark">หมายเลขทะเบียนยานพาหนะ : </strong>`+ rList[z].RegistrationNumber + ` ` + rList[z].Province + `</span><br />
+            <span><strong class="text-dark">ประเภทยานพาหนะ : </strong>`+ rList[z].VehicleType + `</span><br />
         </p>
         <div id="`+ rList[z].ReportingId +`">
             
@@ -857,9 +935,8 @@
                 data: { 'ReportingId': rList[i].ReportingId },
                 url: '/Evidence/getPreviewEvidence',
                 success: function (data) {
-                   
                     if (!data) {
-                        console.log('no evidence');
+                        // no evidence
                     } else {
                         if (data.FileType == "video") {
                             $('#' + data.ReportingId).empty();
@@ -871,7 +948,6 @@
                             $('#' + data.ReportingId).append(`<img class="m-3" src="http://localhost:65108` + data.FullPath.trim() + `" width="70" alt="Generic placeholder image">`);
                         }
                     }
-
                 },
                 error: function (a, b, error) {
                     console.log(error);
@@ -880,13 +956,9 @@
         }
     }
     function formatTime(a) {
-        console.log("================");
         if (a != null) {
-            console.log(a);
             var b = moment(a).format('DD-MM-YYYY HH:mm');
-            console.log(b);
-            var mun = moment(a).toDate();
-            console.log(mun);
+            
             return b;
         } else {
             return 'sumit date is null';
@@ -901,7 +973,6 @@
             data: { 'ReportingId': Report },
             url: '/Evidence/getViewEvidence',
             success: function (data) {
-                console.log(data);
                 if (data.length < 1) {
                     $('#modalSlideEvidencd').append(`<svg class="svg_image" viewBox="0 0 128 128" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><rect x="-1.829" y="-1.688" width="130.251" height="131.601" style="fill:#4a4a4a;" /><text x="26.603px" y="36.853px" style="font-family:'Corbel-Bold', 'Corbel', sans-serif;font-weight:700;font-size:12px;fill:#fff;">NO EVIDENCE</text><g><rect x="19.833" y="68.642" width="26.725" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;" /><path d="M38.096,84.477c0,0 3.297,-2.819 4.726,-2.342c1.428,0.476 3.318,5.162 3.318,5.162l-6.589,-0.012" style="fill:#fff;" /><path d="M39.032,87.345l-19.896,0.157c0,0 4.9,-10.143 6.492,-10.794c1.592,-0.652 4.266,6.839 4.266,6.839c0,0 2.52,-2.866 3.71,-2.736c1.19,0.131 3.964,3.558 3.964,3.558" style="fill:#fff;" /><circle cx="41.199" cy="74.098" r="2.305" style="fill:#fff;" /><rect x="71.596" y="68.642" width="38.259" height="25.881" style="fill:none;stroke:#fff;stroke-width:2px;" /><path d="M90.976,75.393c4.192,0 7.595,2.963 7.595,6.611c0,3.649 -3.403,6.611 -7.595,6.611c-4.192,0 -7.596,-2.962 -7.596,-6.611c0,-3.648 3.404,-6.611 7.596,-6.611Zm3.476,6.449l-5.273,2.706l0.114,-5.623l5.159,2.917Z" style="fill:#fff;" /></g>No evidence</svg>`);
                 } else if (data.length == 1) {
@@ -928,14 +999,12 @@
                 console.log(error);
             }
         });
-        //console.log(Report);
     }
     //===== modal show evidence
     
 
     function plusSlides(n) {
         showSlides(slideIndex += n);
-        console.log('plus : '+ slideIndex);
     }
     function showSlides(n) {
         var i;
